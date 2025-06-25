@@ -1,0 +1,64 @@
+{
+  "name": "@bun-framework/common",
+  "version": "1.0.0",
+  "description": "Bun Web Framework - 通用核心模块",
+  "main": "index.ts",
+  "module": "index.ts",
+  "type": "module",
+  "author": "Bun Framework Team",
+  "license": "MIT",
+  "keywords": [
+    "bun",
+    "framework",
+    "web",
+    "typescript",
+    "decorators",
+    "dependency-injection"
+  ],
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "require": "./index.ts"
+    },
+    "./decorators": "./decorators/index.ts",
+    "./container": "./container/index.ts",
+    "./guards": "./guards/index.ts",
+    "./filters": "./filters/index.ts",
+    "./pipes": "./pipes/index.ts",
+    "./swagger": "./swagger/index.ts",
+    "./middleware": "./middleware/index.ts",
+    "./interceptors": "./interceptors/index.ts",
+    "./lifecycle": "./lifecycle/index.ts"
+  },
+  "files": [
+    "**/*.ts",
+    "**/*.d.ts",
+    "index.ts",
+    "README.md"
+  ],
+  "dependencies": {
+    "@scalar/api-reference": "^1.31.18",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "reflect-metadata": "^0.1.13"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "bun": ">=1.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "bun test",
+    "lint": "bun run lint:check",
+    "lint:check": "echo 'Linting check...'",
+    "type-check": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/bun-framework-common.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/bun-framework-common/issues"
+  },
+  "homepage": "https://github.com/your-username/bun-framework-common#readme"
+}
