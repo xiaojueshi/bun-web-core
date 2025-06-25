@@ -1,11 +1,11 @@
 {
-  "name": "@bun-framework/common",
+  "name": "@xiaojueshi/bun-common",
   "version": "1.0.0",
   "description": "Bun Web Framework - 通用核心模块",
   "main": "index.ts",
   "module": "index.ts",
   "type": "module",
-  "author": "Bun Framework Team",
+  "author": "xiaojueshi",
   "license": "MIT",
   "keywords": [
     "bun",
@@ -55,10 +55,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/bun-framework-common.git"
+    "url": "https://github.com/xiaojueshi/bun-common.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/bun-framework-common/issues"
+    "url": "https://github.com/xiaojueshi/bun-common/issues"
   },
-  "homepage": "https://github.com/your-username/bun-framework-common#readme"
+  "homepage": "https://github.com/xiaojueshi/bun-common#readme"
 }

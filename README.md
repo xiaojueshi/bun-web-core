@@ -1,4 +1,4 @@
-# @bun-framework/common
+# @xiaojueshi/bun-common
 
 Bun Web Framework 的通用核心模块，提供装饰器、依赖注入、守卫、过滤器、管道等核心功能。
 
@@ -17,7 +17,7 @@ Bun Web Framework 的通用核心模块，提供装饰器、依赖注入、守�
 ## 📦 安装
 
 ```bash
-bun add @bun-framework/common
+bun add @xiaojueshi/bun-common
 ```
 
 ## 🚀 快速开始
@@ -226,6 +226,6 @@ MIT License
 
 ## 🔗 相关链接
 
-- [Bun Framework 主项目](https://github.com/your-username/bun-app)
-- [问题反馈](https://github.com/your-username/bun-framework-common/issues)
-- [更新日志](https://github.com/your-username/bun-framework-common/releases)
+- [Bun Framework 主项目](https://github.com/xiaojueshi/bun-app)
+- [问题反馈](https://github.com/xiaojueshi/bun-common.git/issues)
+- [更新日志](https://github.com/xiaojueshi/bun-common.git/releases)
