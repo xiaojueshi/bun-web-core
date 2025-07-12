@@ -78,5 +78,8 @@
   "bugs": {
     "url": "https://github.com/xiaojueshi/bun-web-core/issues"
   },
-  "homepage": "https://github.com/xiaojueshi/bun-web-core#readme"
+  "homepage": "https://github.com/xiaojueshi/bun-web-core#readme",
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5"
+  }
 }
