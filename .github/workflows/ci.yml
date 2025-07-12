@@ -29,42 +29,14 @@ jobs:
       - name: 构建项目
         run: bun run build
 
-      - name: 检查 package.json 版本变更
-        id: version_check
-        run: |
-          git fetch origin --tags
-          PREV_VERSION=$(git tag --sort=-v:refname | head -n1 | sed 's/^v//')
-          CUR_VERSION=$(jq -r .version package.json)
-          echo "PREV_VERSION=$PREV_VERSION" >> $GITHUB_ENV
-          echo "CUR_VERSION=$CUR_VERSION" >> $GITHUB_ENV
-          if [ "$PREV_VERSION" = "$CUR_VERSION" ]; then
-            echo "版本未变更，跳过发版。"
-            echo "publish=false" >> $GITHUB_OUTPUT
-          else
-            echo "检测到新版本: $CUR_VERSION"
-            echo "publish=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: 自动生成 CHANGELOG 并提交 tag
-        if: steps.version_check.outputs.publish == 'true'
-        uses: changesets/action@v1
-        with:
-          publish: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: 发布到 npm
-        if: steps.version_check.outputs.publish == 'true'
-        run: bunx changeset publish
+        run: npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 发布完成提示
-        if: steps.version_check.outputs.publish == 'true'
-        run: echo "🎉 新版本 $CUR_VERSION 已自动发布到 npm！"
+        run: echo "🎉 新版本已自动发布到 npm！"
 # 注意事项：
 # 1. 你需要在 GitHub 仓库的 Settings > Secrets > Actions 中添加 NPM_TOKEN，
 #    该 token 需拥有 npm 发布权限（npm token create --read-only false）。
-# 2. 本流程依赖 changesets 工具自动生成 changelog 和 tag，
-#    请确保已在项目中安装 changesets（bun add -D @changesets/cli），并初始化（bunx changeset init）。
-# 3. 若首次使用 changesets，建议先手动初始化并生成一次 changelog。
+# 2. .npmrc 文件需配置 registry 和 token 占位符。
