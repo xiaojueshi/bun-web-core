@@ -34,6 +34,20 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: 读取 package.json 版本
+        id: pkg
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: 创建 GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.pkg.outputs.version }}
+          release_name: Release v${{ steps.pkg.outputs.version }}
+          draft: false
+          prerelease: false
+
       - name: 发布完成提示
         run: echo "🎉 新版本已自动发布到 npm！"
 # 注意事项：
