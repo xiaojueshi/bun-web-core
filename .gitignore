@@ -1,0 +1,32 @@
+# Node/Bun/TypeScript
+node_modules/
+dist/
+*.tsbuildinfo
+bun.lockb
+
+# Changesets
+.changeset/*.md
+
+# Bun test cache
+.bun-*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Mac 系统文件
+.DS_Store
+
+# 其他
+.env
+.env.*
+
+# 编辑器配置
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+*.swp
+*~
