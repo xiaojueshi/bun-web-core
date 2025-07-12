@@ -358,7 +358,7 @@ export class LoggingInterceptor implements NestInterceptor {
 
 ### 如何贡献
 
-1. **报告问题**: 在 [Issues](https://github.com/xiaojueshi/bun-framework-core/issues) 中报告 Bug 或提出功能请求
+1. **报告问题**: 在 [Issues](https://github.com/xiaojueshi/bun-web-core/issues) 中报告 Bug 或提出功能请求
 2. **提交代码**: Fork 项目并提交 Pull Request
 3. **完善文档**: 帮助改进文档和示例
 4. **分享反馈**: 分享使用体验和建议
@@ -421,8 +421,8 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ```bash
 # 克隆仓库
-git clone https://github.com/xiaojueshi/bun-framework-core.git
-cd bun-framework-core
+git clone https://github.com/xiaojueshi/bun-web-core.git
+cd bun-web-core
 
 # 安装依赖
 bun install
@@ -474,8 +474,8 @@ bun publish
 
 ## 🔗 相关链接
 
-- [GitHub 仓库](https://github.com/xiaojueshi/bun-framework-core)
-- [问题反馈](https://github.com/xiaojueshi/bun-framework-core/issues)
-- [更新日志](https://github.com/xiaojueshi/bun-framework-core/releases)
+- [GitHub 仓库](https://github.com/xiaojueshi/bun-web-core)
+- [问题反馈](https://github.com/xiaojueshi/bun-web-core/issues)
+- [更新日志](https://github.com/xiaojueshi/bun-web-core/releases)
 - [Bun 官方文档](https://bun.sh/docs)
 - [TypeScript 官方文档](https://www.typescriptlang.org/docs/)

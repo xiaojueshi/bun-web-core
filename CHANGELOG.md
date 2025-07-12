@@ -70,7 +70,7 @@
 
 如果您想为这个项目做贡献，请：
 
-1. 检查现有的 [Issues](https://github.com/xiaojueshi/bun-framework-core/issues)
+1. 检查现有的 [Issues](https://github.com/xiaojueshi/bun-web-core/issues)
 2. 创建一个新的 Issue 来讨论您想要添加的功能
 3. Fork 这个项目并创建您的特性分支
 4. 提交您的更改并推送到您的分支
