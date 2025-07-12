@@ -1,7 +1,7 @@
 {
-  "name": "@xiaojueshi/bun-common",
-  "version": "1.0.0",
-  "description": "Bun Web Framework - 通用核心模块",
+  "name": "@xiaojueshi/bun-web-core",
+  "version": "0.1.0-beta.1",
+  "description": "xiaojueshi 的个人开源项目 - 基于 Bun 运行时的现代化 TypeScript Web 框架核心库，提供装饰器、依赖注入、守卫、过滤器等核心功能",
   "main": "index.ts",
   "module": "index.ts",
   "type": "module",
@@ -13,7 +13,17 @@
     "web",
     "typescript",
     "decorators",
-    "dependency-injection"
+    "dependency-injection",
+    "ioc",
+    "guards",
+    "filters",
+    "pipes",
+    "middleware",
+    "interceptors",
+    "validation",
+    "swagger",
+    "rest-api",
+    "beta"
   ],
   "exports": {
     ".": {
@@ -34,7 +44,10 @@
     "**/*.ts",
     "**/*.d.ts",
     "index.ts",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "build.sh"
   ],
   "dependencies": {
     "@scalar/api-reference": "^1.31.18",
@@ -48,17 +61,22 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:watch": "tsc --watch",
     "test": "bun test",
+    "test:watch": "bun test --watch",
     "lint": "bun run lint:check",
     "lint:check": "echo 'Linting check...'",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "bun run build && bun run test && bun run type-check",
+    "version": "echo 'Version: ' && cat package.json | grep version",
+    "clean": "rm -rf dist/ *.tsbuildinfo"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xiaojueshi/bun-common.git"
+    "url": "https://github.com/xiaojueshi/bun-framework-core.git"
   },
   "bugs": {
-    "url": "https://github.com/xiaojueshi/bun-common/issues"
+    "url": "https://github.com/xiaojueshi/bun-framework-core/issues"
   },
-  "homepage": "https://github.com/xiaojueshi/bun-common#readme"
+  "homepage": "https://github.com/xiaojueshi/bun-framework-core#readme"
 }
