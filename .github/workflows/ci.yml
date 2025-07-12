@@ -29,16 +29,11 @@ jobs:
       - name: 构建项目
         run: bun run build
 
-      - name: 发布到 npm
-        run: npm publish --access public
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: 读取 package.json 版本
         id: pkg
         run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
 
-      - name: 创建 GitHub Release
+      - name: 打 tag 并创建 GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -47,6 +42,11 @@ jobs:
           release_name: Release v${{ steps.pkg.outputs.version }}
           draft: false
           prerelease: false
+
+      - name: 发布到 npm
+        run: npm publish --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 发布完成提示
         run: echo "🎉 新版本已自动发布到 npm！"
