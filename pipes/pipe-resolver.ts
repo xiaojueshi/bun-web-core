@@ -3,37 +3,80 @@ import type { Container } from "../container/container";
 import type { PipeTransform } from "./pipe.interface";
 
 /**
+ * 支持的全局管道工厂类型
+ * - 管道类（构造函数）
+ * - 管道实例
+ * - 工厂函数（同步/异步，支持闭包参数）
+ */
+export type PipeFactory =
+  | PipeTransform
+  | (new (...args: any[]) => PipeTransform)
+  | (() => PipeTransform | Promise<PipeTransform>);
+
+/**
  * 管道解析器类
  *
  * 负责管理全局管道和局部管道的注册、解析和执行
  */
 export class PipeResolver {
-  private static globalPipes: (
-    | PipeTransform
-    | (new (...args: any[]) => PipeTransform)
-  )[] = [];
+  private static globalPipes: (() => PipeTransform | Promise<PipeTransform>)[] =
+    [];
   private static globalContainer: Container | null = null;
 
   /**
    * 设置全局管道
-   * @param pipes 管道类或实例数组
+   * @param pipes 支持管道类、实例、工厂函数
    * @param container 依赖注入容器
    */
-  static setGlobalPipes(
-    pipes: (PipeTransform | (new (...args: any[]) => PipeTransform))[],
-    container: Container
-  ): void {
-    this.globalPipes = pipes;
+  static setGlobalPipes(pipes: PipeFactory[], container: Container): void {
+    // 类型校验与工厂函数转换，所有类型都包装为工厂函数
+    const factories: (() => PipeTransform | Promise<PipeTransform>)[] =
+      pipes.map((pipe) => {
+        // 管道类（构造函数）
+        if (
+          typeof pipe === "function" &&
+          pipe.prototype &&
+          typeof pipe.prototype.transform === "function"
+        ) {
+          return () => {
+            try {
+              return container.resolve(
+                pipe as new (...args: any[]) => PipeTransform
+              );
+            } catch {
+              return new (pipe as new (...args: any[]) => PipeTransform)();
+            }
+          };
+        }
+        // 工厂函数（不带 prototype）
+        if (typeof pipe === "function") {
+          return pipe as () => PipeTransform | Promise<PipeTransform>;
+        }
+        // 实例
+        if (pipe && typeof pipe.transform === "function") {
+          return () => pipe;
+        }
+        throw new Error("useGlobalPipes 仅支持管道类、管道实例或工厂函数");
+      });
+    this.globalPipes = factories;
     this.globalContainer = container;
   }
 
   /**
-   * 获取全局管道实例
+   * 获取全局管道实例（支持异步工厂函数）
    * @param container 依赖注入容器
-   * @returns 管道实例数组
+   * @returns Promise<PipeTransform[]> 全部管道实例
    */
-  static getGlobalPipes(container: Container): PipeTransform[] {
-    return this.createPipeInstances(this.globalPipes, container);
+  static async getGlobalPipes(container: Container): Promise<PipeTransform[]> {
+    const factories: (() => PipeTransform | Promise<PipeTransform>)[] =
+      this.globalPipes || [];
+    const pipes = await Promise.all(
+      factories.map(async (factory) => {
+        const result = factory();
+        return result instanceof Promise ? await result : result;
+      })
+    );
+    return pipes;
   }
 
   /**

@@ -4,6 +4,7 @@ import type { RouteMetadata } from "../decorators/http-methods.decorator";
 import { SwaggerModule } from "../swagger/swagger.module";
 import type { SwaggerConfig } from "../swagger/swagger-generator";
 import { GuardResolver } from "../decorators/guard.decorator";
+import type { GuardFactory } from "../decorators/guard.decorator";
 import { GuardExecutor, HttpExecutionContext } from "../guards/guard.interface";
 import type { GuardResult } from "../guards/guard.interface";
 import { ParamResolver } from "../decorators/param.decorator";
@@ -14,6 +15,11 @@ import {
 } from "../filters/exception.filter";
 import { PipeResolver } from "../pipes/pipe-resolver";
 import type { PipeTransform } from "../pipes/pipe.interface";
+import type { PipeFactory } from "../pipes/pipe-resolver";
+import {
+  InterceptorResolver,
+  type InterceptorFactory,
+} from "../decorators/interceptor.decorator";
 
 /**
  * 静态路由配置接口
@@ -101,9 +107,14 @@ export class Application {
 
   /**
    * 设置全局守卫
-   * @param guards 守卫类数组
+   * @param guards 支持守卫类、实例、同步/异步工厂函数
+   * @example
+   *   app.useGlobalGuards(MyGuardClass)
+   *   app.useGlobalGuards(new MyGuard('参数'))
+   *   app.useGlobalGuards(() => new MyGuard('参数'))
+   *   app.useGlobalGuards(async () => await createGuardAsync())
    */
-  useGlobalGuards(...guards: (new (...args: any[]) => any)[]): this {
+  useGlobalGuards(...guards: GuardFactory[]): this {
     GuardResolver.setGlobalGuards(guards, this.container);
     return this;
   }
@@ -119,12 +130,19 @@ export class Application {
 
   /**
    * 设置全局管道
-   * @param pipes 管道类或实例数组
+   * @param pipes 支持管道类、实例、同步/异步工厂函数
    */
-  useGlobalPipes(
-    ...pipes: (PipeTransform | (new (...args: any[]) => PipeTransform))[]
-  ): this {
+  useGlobalPipes(...pipes: PipeFactory[]): this {
     PipeResolver.setGlobalPipes(pipes, this.container);
+    return this;
+  }
+
+  /**
+   * 设置全局拦截器
+   * @param interceptors 支持拦截器类、实例、同步/异步工厂函数
+   */
+  useGlobalInterceptors(...interceptors: InterceptorFactory[]): this {
+    InterceptorResolver.setGlobalInterceptors(interceptors, this.container);
     return this;
   }
 
@@ -228,7 +246,7 @@ export class Application {
                 route.methodName,
                 this.container
               );
-              const globalGuards = GuardResolver.getGlobalGuards(
+              const globalGuards = await GuardResolver.getGlobalGuards(
                 this.container
               );
               const guards = [...globalGuards, ...localGuards];

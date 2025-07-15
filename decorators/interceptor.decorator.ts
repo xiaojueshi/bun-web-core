@@ -37,39 +37,83 @@ export function UseInterceptors(
 }
 
 /**
+ * 支持的全局拦截器工厂类型
+ * - 拦截器类（构造函数）
+ * - 拦截器实例
+ * - 工厂函数（同步/异步，支持闭包参数）
+ */
+export type InterceptorFactory =
+  | NestInterceptor
+  | (new (...args: any[]) => NestInterceptor)
+  | (() => NestInterceptor | Promise<NestInterceptor>);
+
+/**
  * 拦截器解析器类
  */
 export class InterceptorResolver {
-  private static globalInterceptors: (new (
-    ...args: any[]
-  ) => NestInterceptor)[] = [];
+  private static globalInterceptors: (() =>
+    | NestInterceptor
+    | Promise<NestInterceptor>)[] = [];
 
   /**
    * 设置全局拦截器
-   * @param interceptors 拦截器类数组
+   * @param interceptors 支持拦截器类、实例、工厂函数
    * @param container 依赖注入容器
    */
   static setGlobalInterceptors(
-    interceptors: (new (...args: any[]) => NestInterceptor | NestInterceptor)[],
+    interceptors: InterceptorFactory[],
     container: any
   ): void {
-    this.globalInterceptors = interceptors as (new (
-      ...args: any[]
-    ) => NestInterceptor)[];
+    // 类型校验与工厂函数转换
+    const factories = interceptors.map((interceptor) => {
+      // 拦截器类
+      if (
+        typeof interceptor === "function" &&
+        interceptor.prototype &&
+        typeof interceptor.prototype.intercept === "function"
+      ) {
+        return () => {
+          try {
+            return container.resolve(interceptor);
+          } catch {
+            return new (interceptor as new (
+              ...args: any[]
+            ) => NestInterceptor)();
+          }
+        };
+      }
+      // 工厂函数
+      if (typeof interceptor === "function") {
+        return interceptor as () => NestInterceptor | Promise<NestInterceptor>;
+      }
+      // 实例
+      if (interceptor && typeof interceptor.intercept === "function") {
+        return () => interceptor;
+      }
+      throw new Error(
+        "useGlobalInterceptors 仅支持拦截器类、拦截器实例或工厂函数"
+      );
+    });
+    this.globalInterceptors = factories;
   }
 
   /**
-   * 获取全局拦截器实例
+   * 获取全局拦截器实例（支持异步工厂函数）
    * @param container 依赖注入容器
+   * @returns Promise<NestInterceptor[]> 全部拦截器实例
    */
-  static getGlobalInterceptors(container: any): NestInterceptor[] {
-    return this.globalInterceptors.map((InterceptorClass) => {
-      try {
-        return container.resolve(InterceptorClass);
-      } catch {
-        return new InterceptorClass();
-      }
-    });
+  static async getGlobalInterceptors(
+    container: any
+  ): Promise<NestInterceptor[]> {
+    const factories: (() => NestInterceptor | Promise<NestInterceptor>)[] =
+      this.globalInterceptors || [];
+    const interceptors = await Promise.all(
+      factories.map(async (factory) => {
+        const result = factory();
+        return result instanceof Promise ? await result : result;
+      })
+    );
+    return interceptors;
   }
 
   /**

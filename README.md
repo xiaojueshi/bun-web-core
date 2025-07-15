@@ -16,7 +16,7 @@
 
 适用于需要高性能、强类型、易扩展的中大型 Web 服务项目。
 
-> 🚧 **开发阶段** - 当前版本为 v0.1.0-beta.3，这是一个个人开源项目，API 可能会有变化。欢迎提供反馈和建议！
+> 🚧 **开发阶段** - 当前版本为 v0.1.0-beta.4，这是一个个人开源项目，API 可能会有变化。欢迎提供反馈和建议！
 
 ## 📦 安装
 
@@ -274,6 +274,59 @@ export class MyService implements OnModuleInit, OnApplicationShutdown {
 }
 ```
 
+## 🌐 全局管道与拦截器的灵活注册
+
+框架支持全局管道、全局拦截器的多种注册方式，包括：
+
+- 传递类（自动依赖注入）
+- 传递实例
+- 工厂函数（可闭包传参/异步）
+
+### 全局管道注册示例
+
+```typescript
+app.useGlobalPipes(
+  ValidationPipe, // 传递类
+  new ValidationPipe({ skipMissingProperties: true }), // 传递实例
+  () => new ValidationPipe({ whitelist: true }), // 工厂函数
+  async () => await createAsyncPipe() // 异步工厂
+);
+```
+
+### 全局拦截器注册示例
+
+```typescript
+app.useGlobalInterceptors(
+  LoggingInterceptor, // 传递类
+  new LoggingInterceptor(), // 传递实例
+  () => new LoggingInterceptor("参数"), // 工厂函数
+  async () => await createAsyncInterceptor() // 异步工厂
+);
+```
+
+> 推荐：如需传参或异步初始化，优先用工厂函数或 async 工厂。
+
+## 🛡️ 全局守卫的灵活注册
+
+框架支持全局守卫的多种注册方式，包括：
+
+- 传递类（自动依赖注入）
+- 传递实例
+- 工厂函数（可闭包传参/异步）
+
+### 全局守卫注册示例
+
+```typescript
+app.useGlobalGuards(
+  AuthGuard, // 传递类
+  new AuthGuard("参数"), // 传递实例
+  () => new AuthGuard("参数"), // 工厂函数
+  async () => await createAsyncGuard() // 异步工厂
+);
+```
+
+> 推荐：如需传参或异步初始化，优先用工厂函数或 async 工厂。
+
 ## 🔧 高级用法
 
 ### 自定义守卫
@@ -399,7 +452,7 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 
 ## 📦 版本信息
 
-当前版本: **v0.1.0-beta.3**
+当前版本: **v0.1.0-beta.4**
 
 ### 版本说明
 

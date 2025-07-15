@@ -7,6 +7,22 @@ import type { CanActivate } from "../guards/guard.interface";
 export type GuardClass = new (...args: any[]) => CanActivate;
 
 /**
+ * 支持的全局守卫工厂类型
+ * - 守卫类（构造函数）
+ * - 守卫实例
+ * - 工厂函数（同步/异步，支持闭包参数）
+ * @example
+ *   useGlobalGuards(MyGuardClass)
+ *   useGlobalGuards(new MyGuard('参数'))
+ *   useGlobalGuards(() => new MyGuard('参数'))
+ *   useGlobalGuards(async () => await createGuardAsync())
+ */
+export type GuardFactory =
+  | GuardClass
+  | CanActivate
+  | (() => CanActivate | Promise<CanActivate>);
+
+/**
  * UseGuards 装饰器 - 用于应用守卫到控制器或方法
  * @param guards 守卫类数组
  */
@@ -84,28 +100,55 @@ export class GuardResolver {
   }
 
   /**
-   * 获取全局守卫
+   * 获取全局守卫（支持异步工厂函数）
    * @param container 依赖注入容器
+   * @returns Promise<CanActivate[]> 全部守卫实例
    */
-  static getGlobalGuards(container: any): CanActivate[] {
-    const globalGuards: GuardClass[] =
+  static async getGlobalGuards(container: any): Promise<CanActivate[]> {
+    const factories: (() => CanActivate | Promise<CanActivate>)[] =
       Reflect.getMetadata("global:guards", container) || [];
-
-    return globalGuards.map((GuardClass) => {
-      try {
-        return container.resolve(GuardClass);
-      } catch {
-        return new GuardClass();
-      }
-    });
+    const guards = await Promise.all(
+      factories.map(async (factory) => {
+        const result = factory();
+        return result instanceof Promise ? await result : result;
+      })
+    );
+    return guards;
   }
 
   /**
    * 设置全局守卫
-   * @param guards 守卫类数组
+   * @param guards 支持守卫类、实例、工厂函数
    * @param container 依赖注入容器
+   * @throws {Error} 类型不符时抛出
    */
-  static setGlobalGuards(guards: GuardClass[], container: any): void {
-    Reflect.defineMetadata("global:guards", guards, container);
+  static setGlobalGuards(guards: GuardFactory[], container: any): void {
+    // 类型校验与工厂函数转换
+    const factories = guards.map((guard) => {
+      // 守卫类
+      if (
+        typeof guard === "function" &&
+        guard.prototype &&
+        typeof guard.prototype.canActivate === "function"
+      ) {
+        return () => {
+          try {
+            return container.resolve(guard);
+          } catch {
+            return new (guard as GuardClass)();
+          }
+        };
+      }
+      // 工厂函数
+      if (typeof guard === "function") {
+        return guard;
+      }
+      // 实例
+      if (guard && typeof guard.canActivate === "function") {
+        return () => guard;
+      }
+      throw new Error("useGlobalGuards 仅支持守卫类、守卫实例或工厂函数");
+    });
+    Reflect.defineMetadata("global:guards", factories, container);
   }
 }
