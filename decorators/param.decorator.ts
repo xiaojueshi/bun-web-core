@@ -263,7 +263,7 @@ export class ParamResolver {
     container: any
   ): Promise<any> {
     // 获取全局管道
-    const globalPipes = PipeResolver.getGlobalPipes(container);
+    const globalPipes = await PipeResolver.getGlobalPipes(container);
 
     // 获取参数级别的管道
     const parameterPipes = PipeResolver.resolveParameterPipes(
