@@ -39,12 +39,30 @@ export class SwaggerModule {
   <title>${spec.info.title}</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    #app {
+      height: 100vh;
+      width: 100vw;
+    }
+  </style>
 </head>
 <body>
-  <script
-    id="api-reference"
-    type="application/json">${JSON.stringify(spec, null, 2)}</script>
+  <div id="app"></div>
+
+  <!-- Load the Scalar API Reference Script -->
   <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+
+  <!-- Initialize the Scalar API Reference -->
+  <script>
+    Scalar.createApiReference('#app', {
+      url: '/docs-json'
+    });
+  </script>
 </body>
 </html>`;
   }

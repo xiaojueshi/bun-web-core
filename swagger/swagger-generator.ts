@@ -163,7 +163,9 @@ export class SwaggerGenerator {
    */
   private generatePathOperation(route: RouteInfo, path: string): any {
     const controllerClass = route.controller.constructor;
-    const methodName = this.getMethodNameFromHandler(route.handler);
+    // 优先使用路由信息中的方法名，如果不存在则尝试从处理函数获取
+    const methodName =
+      route.methodName || this.getMethodNameFromHandler(route.handler);
 
     // 获取 Swagger 元数据
     const operations =
@@ -301,16 +303,26 @@ export class SwaggerGenerator {
    * 从处理函数中获取方法名
    */
   private getMethodNameFromHandler(handler: Function): string {
-    // 尝试从函数名中提取方法名
+    // 优先使用函数名
+    if (
+      handler.name &&
+      handler.name !== "bound" &&
+      handler.name !== "anonymous"
+    ) {
+      return handler.name;
+    }
+
+    // 尝试从函数字符串中提取方法名
     const funcStr = handler.toString();
     const match = funcStr.match(/function\s+([^(]+)/);
     if (match && match[1]) {
       return match[1];
     }
 
-    // 如果是绑定的函数，尝试从 name 属性获取
-    if (handler.name && handler.name !== "bound") {
-      return handler.name;
+    // 尝试从箭头函数中提取
+    const arrowMatch = funcStr.match(/=>\s*\{[^}]*\}/);
+    if (arrowMatch) {
+      return "arrowFunction";
     }
 
     return "unknownMethod";
@@ -323,6 +335,15 @@ export class SwaggerGenerator {
     if (!type) return null;
 
     if (typeof type === "string") {
+      // 处理数组类型
+      if (type.endsWith("[]")) {
+        const baseType = type.slice(0, -2);
+        return {
+          type: "array",
+          items: this.getSchemaForType(baseType),
+        };
+      }
+
       switch (type) {
         case "User":
           return { $ref: "#/components/schemas/User" };
@@ -330,6 +351,10 @@ export class SwaggerGenerator {
           return { $ref: "#/components/schemas/CreateUserDto" };
         case "UpdateUserDto":
           return { $ref: "#/components/schemas/UpdateUserDto" };
+        case "ErrorResponse":
+          return { $ref: "#/components/schemas/ErrorResponse" };
+        case "ApiResponse":
+          return { $ref: "#/components/schemas/ApiResponse" };
         default:
           return { type: "object" };
       }

@@ -147,6 +147,14 @@ export class Application {
   }
 
   /**
+   * 获取所有路由信息
+   * @returns 路由信息数组
+   */
+  getRoutes(): RouteInfo[] {
+    return [...this.routes];
+  }
+
+  /**
    * 加载模块
    */
   private loadModule(ModuleClass: any): void {

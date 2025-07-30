@@ -30,7 +30,7 @@ bun add @xiaojueshi/bun-web-core
 - **Bun**: `>=1.0.0` (推荐使用最新版本)
 - **TypeScript**: `>=5.0.0`
 
-## 🚀 为什么选择 Bun Framework Core？
+## 🚀 为什么选择 @xiaojueshi/bun-web-core？
 
 - ⚡ **极速性能**: 基于 Bun 运行时，比 Node.js 快 3-4 倍
 - 🎯 **类型安全**: 完整的 TypeScript 支持，提供优秀的开发体验
