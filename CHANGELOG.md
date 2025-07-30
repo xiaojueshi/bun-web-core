@@ -17,6 +17,30 @@
 
 - 自动化构建与发布流程优化，支持自动发布 npm 包和 GitHub Release。
 
+## [0.1.0-beta.5] - 2025-01-XX
+
+### ✨ 新增功能
+
+- **Swagger 文档生成优化**：
+  - 改进方法名提取逻辑，优先使用路由信息中的方法名
+  - 增强数组类型的 Schema 支持
+  - 添加更多预定义类型的支持（ErrorResponse、ApiResponse）
+  - 优化 Swagger UI 界面样式和初始化方式
+- **应用功能增强**：
+  - 新增 `getRoutes()` 方法，用于获取所有路由信息
+
+### 📚 文档完善
+
+- 新增 `docs/swagger-usage.md` 详细使用文档
+- 新增 `examples/swagger-complete-example.ts` 完整示例代码
+- 更新 README.md 中的项目名称引用
+
+### 🔧 技术改进
+
+- 优化 Swagger 生成器的类型推断逻辑
+- 改进函数名提取算法，支持更多函数类型
+- 增强 Swagger UI 的用户体验
+
 ## [0.1.0-beta.4] - 2025-07-15
 
 ### ✨ 新增功能

@@ -1,6 +1,6 @@
 {
   "name": "@xiaojueshi/bun-web-core",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0-beta.5",
   "description": "xiaojueshi 的个人开源项目 - 基于 Bun 运行时的现代化 TypeScript Web 框架核心库，提供装饰器、依赖注入、守卫、过滤器等核心功能",
   "main": "index.ts",
   "module": "index.ts",
