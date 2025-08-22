@@ -16,7 +16,7 @@
 
 适用于需要高性能、强类型、易扩展的中大型 Web 服务项目。
 
-> 🚧 **开发阶段** - 当前版本为 v0.1.0-beta.5，这是一个个人开源项目，API 可能会有变化。欢迎提供反馈和建议！
+> 🚧 **开发阶段** - 当前版本为 v0.1.0-beta.6，这是一个个人开源项目，API 可能会有变化。欢迎提供反馈和建议！
 
 ## 📦 安装
 
@@ -184,7 +184,7 @@ export class UserController {
 - `@Injectable()`：声明服务可被依赖注入
 - `@Controller(path)`：声明控制器及路由前缀
 - `@Module(options)`：声明模块及依赖
-- `@Get()`, `@Post()`, `@Put()`, `@Delete()`, `@Patch()`：HTTP 路由方法装饰器
+- `@Get()`, `@Post()`, `@Put()`, `@Delete()`, `@Patch()`：HTTP 路由方法装饰器（支持通配符路由）
 - `@Param(key)`, `@Query(key)`, `@Body()`, `@Headers(key)`：参数提取装饰器
 - `@UseGuards(...guards)`：应用守卫
 - `@UseFilters(...filters)`：应用异常过滤器
@@ -401,6 +401,59 @@ export class LoggingInterceptor implements NestInterceptor {
       console.log(`响应时间: ${Date.now() - start}ms`);
       return data;
     });
+  }
+}
+```
+
+## 🌟 通配符路由支持
+
+框架现在支持通配符路由，提供了更灵活的路由匹配能力：
+
+### 单段通配符 (*)
+
+匹配单个路径段：
+
+```typescript
+@Controller("/api")
+export class FileController {
+  // 匹配 /api/files/document.txt, /api/files/image.png 等
+  @Get("/files/*")
+  getFile() {
+    return { message: "获取文件" };
+  }
+}
+```
+
+### 多段通配符 (**)
+
+匹配多个路径段：
+
+```typescript
+@Controller("/api")
+export class DocsController {
+  // 匹配 /api/docs/guide/intro.md, /api/docs/api/reference.md 等多级路径
+  @Get("/docs/**")
+  getDocument() {
+    return { message: "获取文档" };
+  }
+}
+```
+
+### 参数与通配符组合
+
+```typescript
+@Controller("/api")
+export class DataController {
+  // 匹配 /api/data/users.json, /api/data/config/app.json 等
+  @Post("/data/**")
+  createData() {
+    return { message: "创建数据" };
+  }
+  
+  // 匹配 /api/users/123/posts, /api/users/456/posts 等
+  @Get("/users/:id/*")
+  getUserData() {
+    return { message: "获取用户数据" };
   }
 }
 ```
