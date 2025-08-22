@@ -367,6 +367,10 @@ export class Application {
 
   /**
    * 匹配路由路径
+   * 支持通配符路由:
+   * - '*' 匹配单个路径段
+   * - '**' 匹配多个路径段
+   * - ':param' 匹配单个路径段并作为参数
    */
   private matchRoute(
     routePath: string,
@@ -375,31 +379,72 @@ export class Application {
     const routeSegments = routePath.split("/").filter(Boolean);
     const requestSegments = requestPath.split("/").filter(Boolean);
 
-    if (routeSegments.length !== requestSegments.length) {
-      return null;
-    }
-
     const params: Record<string, string> = {};
 
-    for (let i = 0; i < routeSegments.length; i++) {
-      const routeSegment = routeSegments[i];
-      const requestSegment = requestSegments[i];
+    let routeIndex = 0;
+    let requestIndex = 0;
+
+    while (routeIndex < routeSegments.length && requestIndex < requestSegments.length) {
+      const routeSegment = routeSegments[routeIndex];
+
+      // 处理通配符 '**'
+      if (routeSegment === "**") {
+        // '**' 必须是最后一个路由段
+        if (routeIndex !== routeSegments.length - 1) {
+          return null;
+        }
+        
+        // 将剩余的所有请求段作为参数值
+        const remainingPath = requestSegments.slice(requestIndex).join("/");
+        params["**"] = remainingPath;
+        return params;
+      }
+
+      const requestSegment = requestSegments[requestIndex];
 
       if (!routeSegment || !requestSegment) {
         return null;
       }
 
+      // 处理参数 ':param'
       if (routeSegment.startsWith(":")) {
-        // 动态参数
         const paramName = routeSegment.slice(1);
         params[paramName] = requestSegment;
-      } else if (routeSegment !== requestSegment) {
-        // 静态段不匹配
+        routeIndex++;
+        requestIndex++;
+        continue;
+      }
+
+      // 处理通配符 '*'
+      if (routeSegment === "*") {
+        // '*' 匹配单个路径段
+        routeIndex++;
+        requestIndex++;
+        continue;
+      }
+
+      // 静态段匹配
+      if (routeSegment !== requestSegment) {
         return null;
+      }
+
+      routeIndex++;
+      requestIndex++;
+    }
+
+    // 检查是否所有段都已匹配
+    if (routeIndex === routeSegments.length && requestIndex === requestSegments.length) {
+      return params;
+    }
+
+    // 处理特殊情况：路由以 '*' 结尾
+    if (routeIndex === routeSegments.length - 1 && routeSegments[routeIndex] === "*") {
+      if (requestIndex === requestSegments.length - 1) {
+        return params;
       }
     }
 
-    return params;
+    return null;
   }
 
   /**

@@ -212,3 +212,57 @@ test("useGlobalInterceptors 类型校验异常", () => {
     /仅支持拦截器类、拦截器实例或工厂函数/
   );
 });
+
+// 通配符路由测试
+test("matchRoute 支持静态路径匹配", () => {
+  const app = new Application(FakeModule);
+  // @ts-ignore 访问私有方法进行测试
+  const matchRoute = app["matchRoute"].bind(app);
+  
+  expect(matchRoute("/users", "/users")).toEqual({});
+  expect(matchRoute("/users/list", "/users/list")).toEqual({});
+  expect(matchRoute("/users", "/posts")).toBeNull();
+});
+
+test("matchRoute 支持参数路径匹配", () => {
+  const app = new Application(FakeModule);
+  // @ts-ignore 访问私有方法进行测试
+  const matchRoute = app["matchRoute"].bind(app);
+  
+  expect(matchRoute("/users/:id", "/users/123")).toEqual({ id: "123" });
+  expect(matchRoute("/users/:id/posts/:postId", "/users/123/posts/456")).toEqual({ id: "123", postId: "456" });
+  expect(matchRoute("/users/:id", "/users")).toBeNull();
+});
+
+test("matchRoute 支持单段通配符匹配", () => {
+  const app = new Application(FakeModule);
+  // @ts-ignore 访问私有方法进行测试
+  const matchRoute = app["matchRoute"].bind(app);
+  
+  expect(matchRoute("/users/*", "/users/123")).toEqual({});
+  expect(matchRoute("/files/*", "/files/document.txt")).toEqual({});
+  expect(matchRoute("/api/*/info", "/api/v1/info")).toEqual({});
+  expect(matchRoute("/users/*", "/users/123/posts")).toBeNull();
+});
+
+test("matchRoute 支持多段通配符匹配", () => {
+  const app = new Application(FakeModule);
+  // @ts-ignore 访问私有方法进行测试
+  const matchRoute = app["matchRoute"].bind(app);
+  
+  expect(matchRoute("/files/**", "/files/path/to/file.txt")).toEqual({ "**": "path/to/file.txt" });
+  expect(matchRoute("/api/**", "/api/v1/users/123")).toEqual({ "**": "v1/users/123" });
+  expect(matchRoute("/static/**", "/static/css/main.css")).toEqual({ "**": "css/main.css" });
+});
+
+test("matchRoute 支持参数和通配符组合", () => {
+  const app = new Application(FakeModule);
+  // @ts-ignore 访问私有方法进行测试
+  const matchRoute = app["matchRoute"].bind(app);
+  
+  expect(matchRoute("/users/:id/*", "/users/123/posts")).toEqual({ id: "123" });
+  expect(matchRoute("/files/:category/**", "/files/documents/path/to/file.txt")).toEqual({ 
+    category: "documents", 
+    "**": "path/to/file.txt" 
+  });
+});
